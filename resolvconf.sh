@@ -23,7 +23,7 @@ hostscount=$(echo "$hosts" | wc -l)
 
 # Alright, we have our list of Tier2 servers and will now ping them
 echo "Pinging $hostscount hosts to determine the top 4 ... (this might take up to a minute... or two...)" 1>&2
-pingresults=$(fping -q -p 20 -r 0 -c 10 $hosts 2>&1)
+pingresults=$(fping -q -p 20 -r 0 -c 25 $hosts 2>&1)
 
 # We need to throw away servers that fall below the average packet loss of all servers
 # Explanation of packet loss filter:
