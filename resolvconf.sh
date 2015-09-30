@@ -8,6 +8,26 @@ for needed_single in $needed; do
 	exit 1
 done
 
+workinprogress(){
+needed_for_lookup="dig drill host"
+lookupcmd=""
+for needed_for_lookup_single in $needed_for_lookup; do
+	if which "$needed_for_lookup_single" > /dev/null 2> /dev/null; then
+		case "$needed_for_lookup_single" in
+			dig)
+				lookupcmd="dig +tries=2 +time=5 +short A api.opennicproject.org @%"
+			;;
+			drill)
+				lookupcmd=""
+			;;
+			host)
+				lookupcmd=""
+			;;
+		esac
+	fi
+done
+}
+
 # With our existing servers in /etc/resolv.conf we need to find out what the IP address of api.opennicproject.org is
 result=$(cat /etc/resolv.conf | awk '$1 == "nameserver" {print $2}' | xargs -n1 -P4 -I% sh -c 'dig +tries=2 +time=5 +short A api.opennicproject.org @%' | egrep -v '^((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))' | sort | uniq -c | sort -rn | awk '{print $2}')
 if [ "x$result" == "x" ]; then
