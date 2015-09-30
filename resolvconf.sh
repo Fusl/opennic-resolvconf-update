@@ -1,6 +1,6 @@
 #!/bin/bash
 
-needed="fping awk xargs sort uniq dig"
+needed="fping awk xargs sort uniq dig curl"
 
 for needed_single in $needed; do
 	which "$needed_single" > /dev/null 2> /dev/null && continue
