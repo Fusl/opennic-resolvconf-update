@@ -44,4 +44,10 @@ echo "$hosts" | head -n 4 | awk '{print "nameserver "$1}'
 resolvconf=$(echo "$hosts" | head -n 4 | awk '{print "nameserver "$1}')$(cat /etc/resolv.conf | awk '$1 != "nameserver"')
 
 # If we have write access to resolv.conf, lets update it
-test -w /etc/resolv.conf && echo "$resolv.conf"
+# There is currently no reliable way of building a correct resolv.conf perfectly merging into the existing resolv.conf - I will update this at a later time
+#if test -w /etc/resolv.conf; then
+#	read -p "I have write access to /etc/resolv.conf. Should I update it for you?" yn
+#	if [ "x$yn" == "xYes" -o "x$yn" == "xyes" -o "x$yn" == "xy" -o "x$yn" == "xY" ]; then
+#		echo "$resolvconf" > /etc/resolv.conf
+#	fi
+#fi
