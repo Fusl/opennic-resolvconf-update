@@ -1,5 +1,9 @@
 #!/bin/bash
 
+realpath=$(realpath resolvconf.sh)
+dirname=$(dirname "$realpath")
+cd "$dirname"
+
 needed="fping awk xargs sort uniq dig curl"
 
 for needed_single in $needed; do
