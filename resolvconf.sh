@@ -34,10 +34,10 @@ pingresults=$(fping -q -p 20 -r 0 -c 25 $hosts 2>&1)
 # 5 servers, #1 received 1 response, #2 received 2 responses, #3 received 3 responses, #4 = 4, #5 = 5
 # (1+2+3+4+5)/5 = 3, the average amount of responses per server is 3
 # So we will now filter all servers that have a response packet count of below 3 (in this case #1 and #2 fall out of our list; #3, #4 and #5 are the servers we're going to test)
-avglost=$(echo "$pingresults" | awk -F/ 'BEGIN{sum=0;count=0;}{count+=1;sum+=$4}END{print sum/count;}')
+avgrcvd=$(echo "$pingresults" | awk -F/ 'BEGIN{sum=0;count=0;}{count+=1;sum+=$4}END{print sum/count;}')
 
 # Here we will finally apply the packet loss filter and also sort the servers after average response time
-hosts=$(echo "$pingresults" | awk -F/ '$4 >= '$avglost'' | sort -t/ -nk8)
+hosts=$(echo "$pingresults" | awk -F/ '$4 >= '$avgrcvd'' | sort -t/ -nk8)
 
 # Lets build our resolv.conf
 echo "$hosts" | head -n 4 | awk '{print "nameserver "$1}'
