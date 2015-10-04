@@ -4,7 +4,7 @@ realpath=$(realpath resolvconf.sh)
 dirname=$(dirname "$realpath")
 cd "$dirname"
 
-needed="fping awk xargs sort uniq dig curl"
+needed="fping awk xargs sort uniq curl"
 
 for needed_single in $needed; do
 	which "$needed_single" > /dev/null 2> /dev/null && continue
