@@ -4,7 +4,7 @@ realpath=$(realpath resolvconf.sh)
 dirname=$(dirname "$realpath")
 cd "$dirname"
 
-needed="fping awk xargs sort uniq curl"
+needed="awk sort uniq curl"
 
 for needed_single in $needed; do
 	which "$needed_single" > /dev/null 2> /dev/null && continue
@@ -13,7 +13,7 @@ for needed_single in $needed; do
 done
 
 # With our existing servers in /etc/resolv.conf we need to find out what the IP address of api.opennicproject.org is
-result=$(cat /etc/resolv.conf | awk '$1 == "nameserver" {print $2}' | xargs -n1 -P4 -I% ./_dnslookup.sh % | egrep -v '^((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))' | sort | uniq -c | sort -rn | awk '{print $2}')
+result=$(cat /etc/resolv.conf | awk '$1 == "nameserver" {print $2}' | ./_multiexec.sh ./_dnslookup.sh 4 | egrep -v '^((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))' | sort | uniq -c | sort -rn | awk '{print $2}')
 if [ "x$result" == "x" ]; then
 	# Our fallback is to have a static IP address configured of api.opennicproject.org
 	result="173.160.58.201"
@@ -27,7 +27,7 @@ hostscount=$(echo "$hosts" | wc -l)
 
 # Alright, we have our list of Tier2 servers and will now ping them
 echo "Pinging $hostscount hosts to determine the top 4 ... (this might take up to a minute... or two...)" 1>&2
-pingresults=$(fping -q -p 20 -r 0 -c 25 $hosts 2>&1)
+pingresults=$(./_ping.sh $hosts)
 
 # We need to throw away servers that fall below the average packet loss of all servers
 # Explanation of packet loss filter:
