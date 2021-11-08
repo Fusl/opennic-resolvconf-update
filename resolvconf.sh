@@ -14,7 +14,7 @@ done
 
 # With our existing servers in /etc/resolv.conf we need to find out what the IP address of api.opennicproject.org is
 result=$(cat /etc/resolv.conf | awk '$1 == "nameserver" {print $2}' | ./_multiexec.sh ./_dnslookup.sh 4 | egrep -v '^((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))' | sort | uniq -c | sort -rn | awk '{print $2}')
-if [ "x$result" == "x" ]; then
+if [ "$result" == "x" ]; then
 	# Our fallback is to have a static IP address configured of api.opennicproject.org
 	result="173.160.58.201"
 fi
@@ -22,7 +22,8 @@ apihost=$(echo "$result" | head -n 1)
 echo "Using $apihost as API host ..." 1>&2
 
 # Since we now know the IP address of api.opennicproject.org, lets query the API for some Tier2 servers we can use for testing ...
-hosts=$(curl --silent --resolve "api.opennicproject.org:443:$apihost" "https://api.opennicproject.org/geoip/?bare&ipv=4&res=100000" || curl --silent --insecure --header "Host: api.opennicproject.org" "https://$apihost/geoip/?bare&ipv=4&res=1000")
+hosts=$(wget --quiet --no-check-certificate https://servers.opennic.org/ -O -|grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}')
+#hosts=$(curl --silent --resolve "api.opennicproject.org:443:$apihost" "https://api.opennicproject.org/geoip/?bare&ipv=4&res=100000" || curl --silent --insecure --header "Host: api.opennicproject.org" "https://$apihost/geoip/?bare&ipv=4&res=1000")
 hostscount=$(echo "$hosts" | wc -l)
 
 # Alright, we have our list of Tier2 servers and will now ping them
